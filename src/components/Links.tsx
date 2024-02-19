@@ -14,7 +14,7 @@ const variants = {
   visible: {
     opacity: 1,
     transition: {
-      delayChildren: 0,
+      delayChildren: 0.4,
       staggerChildren: 0.08,
     },
   },

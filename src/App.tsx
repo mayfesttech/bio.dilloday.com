@@ -60,8 +60,9 @@ const Socials = styled.div`
   gap: 4px;
 `;
 
-const Loading = styled.p`
+const StatusText = styled.p`
   opacity: 0.75;
+  height: 256px;
 `;
 
 const Footer = styled.p`
@@ -71,7 +72,7 @@ const Footer = styled.p`
 `;
 
 function App() {
-  const [status, setStatus] = useState('Dilloading links...');
+  const [status, setStatus] = useState('');
   const [links, setLinks] = useState<LinkData[] | null>(null);
   useEffect(() => {
     getDoc(doc(db, 'bio', 'content'))
@@ -83,6 +84,13 @@ function App() {
       .catch((error) => {
         setStatus(`Error getting links: ${error}`);
       });
+
+    // no need to show loading status if load times are fast
+    const timeout = setTimeout(() => {
+      setStatus('Dilloading links...');
+    }, 2000);
+
+    return () => clearTimeout(timeout);
   }, []);
   return (
     <ThemeProvider theme={theme}>
@@ -108,12 +116,12 @@ function App() {
           </Socials>
           {links ? (
             <Links>
-              {links.map((link) => <Link key={link.title} {...link} />) || (
-                <Loading>{status}</Loading>
-              )}
+              {links.map((link) => (
+                <Link key={link.title} {...link} />
+              ))}
             </Links>
           ) : (
-            <Loading>{status}</Loading>
+            <StatusText>{status}</StatusText>
           )}
 
           <MailingList />
