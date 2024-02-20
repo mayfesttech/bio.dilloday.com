@@ -126,7 +126,7 @@ function App() {
 
           <MailingList />
           <Footer>
-            Copyright © Mayfest Productions {new Date().getFullYear()}
+            Copyright © {new Date().getFullYear()} Mayfest Productions
           </Footer>
         </Main>
       </AnimatePresence>
