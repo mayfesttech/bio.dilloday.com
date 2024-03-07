@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -9,9 +8,7 @@ const firebaseConfig = {
   storageBucket: 'dillo-day.appspot.com',
   messagingSenderId: '1025535388888',
   appId: '1:1025535388888:web:32c934380d9ce0332cfbad',
-  measurementId: 'G-F3RGPCT3P8',
 };
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-getAnalytics(app);
