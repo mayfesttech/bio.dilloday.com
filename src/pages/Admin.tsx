@@ -1,10 +1,11 @@
 import styled, { ThemeProvider } from 'styled-components';
 import { theme } from '../theme';
 import { useEffect, useState } from 'react';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider, db } from '../app';
 import styles from './admin.module.css';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -21,7 +22,7 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 640px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 64px 32px;
   box-sizing: border-box;
@@ -42,27 +43,40 @@ export default function Admin() {
   const [authorized, setAuthorized] = useState(false);
   const [curEmail, setCurEmail] = useState('');
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState(
+    'To access the admin page, please sign in.'
+  );
   var validEmails = [] as string[];
 
   const handleClick = () => {
     signInWithPopup(auth, provider).then((result) => {
       const docRef = doc(db, 'bio', 'admin');
       setLoading(true);
-      getDoc(docRef).then((doc) => {
-        if (doc.exists()) {
-          validEmails = doc.data().users;
+      getDoc(docRef)
+        .then((doc) => {
+          if (doc.exists()) {
+            validEmails = doc.data().users;
 
-          setAuthorized(
-            validEmails.includes(result.user.email ? result.user.email : '')
-          );
-          setCurEmail(result.user.email ? result.user.email : '');
-          localStorage.setItem(
-            'email',
-            result.user.email ? result.user.email : ''
-          );
-          setLoading(false);
-        }
-      });
+            if (
+              validEmails.includes(result.user.email ? result.user.email : '')
+            ) {
+              setAuthorized(true);
+              setStatus('Signed in');
+            } else {
+              setAuthorized(false);
+              setStatus('This email is not an admin. Please try agin.');
+            }
+            setCurEmail(result.user.email ? result.user.email : '');
+            localStorage.setItem(
+              'email',
+              result.user.email ? result.user.email : ''
+            );
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          setStatus('Error logging in. Please try again');
+        });
     });
   };
 
@@ -73,13 +87,20 @@ export default function Admin() {
       if (doc.exists()) {
         validEmails = doc.data().users;
 
-        setAuthorized(
+        if (
           validEmails.includes(
             localStorage.getItem('email')
               ? (localStorage.getItem('email') as string)
               : ''
           )
-        );
+        ) {
+          setAuthorized(true);
+          setStatus('Signed in');
+        } else {
+          setAuthorized(false);
+          setStatus('To access the admin page, please sign in.');
+        }
+
         setLoading(false);
       }
     });
@@ -94,11 +115,7 @@ export default function Admin() {
             <Logo src="/logo.png" />
             {loading ? null : (
               <div className={styles.contentContainer}>
-                <h2 className={styles.header}>
-                  {curEmail == ''
-                    ? `To access the admin page, please sign in.`
-                    : `This email is not an admin. Please try again.`}
-                </h2>
+                <h2 className={styles.header}>{status}</h2>
                 <div onClick={handleClick} className={styles.buttonContainer}>
                   <p className={styles.signInText}>Sign in with </p>
                   <FontAwesomeIcon
@@ -115,10 +132,51 @@ export default function Admin() {
           <Background src="/background.jpg" />
           <Main>
             <Logo src="/logo.png" />
-            Signed in
+            <p>{status}</p>
+            <SignOut
+              setAuthorized={setAuthorized}
+              setCurEmail={setCurEmail}
+              setLoading={setLoading}
+              setStatus={setStatus}
+            />
           </Main>
         </div>
       )}
     </ThemeProvider>
+  );
+}
+
+type SignOutProps = {
+  setAuthorized: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurEmail: React.Dispatch<React.SetStateAction<string>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
+};
+
+function SignOut(props: SignOutProps) {
+  const handleClick = () => {
+    props.setLoading(true);
+    signOut(auth)
+      .then(() => {
+        localStorage.clear();
+        props.setAuthorized(false);
+        props.setCurEmail('');
+        props.setStatus('To access the admin page, please sign in.');
+        props.setLoading(false);
+      })
+      .catch((error) => {
+        props.setStatus('Error signing out! Please try again.');
+        props.setLoading(false);
+      });
+  };
+
+  return (
+    <div onClick={handleClick} className={styles.buttonContainer}>
+      <p className={styles.signInText}>Sign Out</p>
+      <FontAwesomeIcon
+        className={styles.googleButton}
+        icon={faRightFromBracket}
+      />
+    </div>
   );
 }
