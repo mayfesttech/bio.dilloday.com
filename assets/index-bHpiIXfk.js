@@ -2782,6 +2782,7 @@ This typically indicates that your device does not have a healthy Internet conne
   padding: 12px 16px;
   background: ${({theme:e})=>e.linkBackground};
   border: 2px solid ${({theme:e})=>e.linkBackground};
+  color: ${({theme:e})=>e.linkForeground};
   border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease-in-out;
@@ -2791,7 +2792,6 @@ This typically indicates that your device does not have a healthy Internet conne
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  // mi piace il tuo stile
 
   &:hover {
     background: ${({theme:e})=>e.linkBackgroundHover};
