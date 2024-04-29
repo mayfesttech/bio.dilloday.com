@@ -98,6 +98,7 @@ const Submit = styled.button`
   padding: 12px 16px;
   background: ${({ theme }) => theme.linkBackground};
   border: 2px solid ${({ theme }) => theme.linkBackground};
+  color: ${({ theme }) => theme.linkForeground};
   border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease-in-out;
@@ -107,7 +108,6 @@ const Submit = styled.button`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  // mi piace il tuo stile
 
   &:hover {
     background: ${({ theme }) => theme.linkBackgroundHover};

@@ -71,7 +71,7 @@ const Footer = styled.p`
   margin: 32px 0;
 `;
 
-function App() {
+export default function App() {
   const [status, setStatus] = useState('');
   const [links, setLinks] = useState<LinkData[] | null>(null);
   useEffect(() => {
@@ -133,5 +133,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;
