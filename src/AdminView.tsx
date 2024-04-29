@@ -8,6 +8,9 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc } from 'firebase/firestore';
+import { LinkData } from './types';
+import Link from './components/Link';
+import Links from './components/Links';
 
 const Background = styled.img`
   width: 100%;
@@ -22,7 +25,7 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 800px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 64px 32px;
   box-sizing: border-box;
@@ -39,12 +42,41 @@ const Logo = styled.img`
   border: 8px solid ${({ theme }) => theme.background};
 `;
 
-export default function AdminView() {
+const StatusText = styled.p`
+  opacity: 0.75;
+  height: 256px;
+`;
+
+export default function Admin() {
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState(
     'To access the admin page, please sign in.'
   );
+
+  const [links, setLinks] = useState<LinkData[] | null>(null);
+
+  useEffect(() => {
+    if (authorized) {
+      getDoc(doc(db, 'bio', 'content'))
+        .then((doc) => {
+          if (doc.exists()) {
+            setLinks(doc.data().links);
+          }
+        })
+        .catch((error) => {
+          setStatus(`Error getting links: ${error}`);
+        });
+
+      // no need to show loading status if load times are fast
+      const timeout = setTimeout(() => {
+        setStatus('Dilloading links...');
+      }, 2000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [authorized]);
+
   var validEmails = [] as string[];
 
   const handleClick = () => {
@@ -60,7 +92,7 @@ export default function AdminView() {
               validEmails.includes(result.user.email ? result.user.email : '')
             ) {
               setAuthorized(true);
-              setStatus('Signed in');
+              setStatus('Dilloading links...');
             } else {
               setAuthorized(false);
               setStatus('This email is not an admin. Please try agin.');
@@ -93,7 +125,7 @@ export default function AdminView() {
           )
         ) {
           setAuthorized(true);
-          setStatus('Signed in');
+          setStatus('Dilloading links...');
         } else {
           setAuthorized(false);
           setStatus('To access the admin page, please sign in.');
@@ -130,7 +162,15 @@ export default function AdminView() {
           <Background src="/background.jpg" />
           <Main>
             <Logo src="/logo.png" />
-            <p>{status}</p>
+            {links ? (
+              <Links>
+                {links.map((link) => (
+                  <Link key={link.title} {...link} />
+                ))}
+              </Links>
+            ) : (
+              <StatusText>{status}</StatusText>
+            )}
             <SignOut
               setAuthorized={setAuthorized}
               setLoading={setLoading}
