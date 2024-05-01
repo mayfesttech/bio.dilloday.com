@@ -100,6 +100,7 @@
   transition:
     background-color 150ms ease-in-out,
     color 150ms ease-in-out;
+  width: 100%;
 }
 
 .saveButton:hover {
@@ -149,4 +150,32 @@
   display: flex;
   flex-direction: column;
   justify-items: flex-start;
+  margin-right: 20px;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 15px;
+}
+
+.addButton {
+  border: none;
+  background-color: #f8b547;
+  color: #f5efdb;
+  padding: 25px 0;
+  font-weight: 900;
+  font-size: 20px;
+  border-radius: 15px;
+  width: 100px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
+
+.addButton:hover {
+  background-color: #f5efdb;
+  color: #f8b547;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
 }

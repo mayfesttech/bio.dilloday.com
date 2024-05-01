@@ -8,6 +8,7 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import {
   faRightFromBracket,
   faGripVertical,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -27,7 +28,7 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 64px 32px;
   box-sizing: border-box;
@@ -59,9 +60,6 @@ const TextContainer = styled.div`
   border-radius: 0 16px 16px 0;
   width: 100%;
   text-decoration: none;
-  transition:
-    background-color 150ms ease-in-out,
-    color 150ms ease-in-out;
 `;
 
 const Container = styled(motion.div)`
@@ -71,7 +69,7 @@ const Container = styled(motion.div)`
   border-radius: 16px;
   width: 100%;
   text-decoration: none;
-  padding: 20px 20px 20px 0;
+  padding: 20px 0 20px 0;
   transition:
     background-color 150ms ease-in-out,
     color 150ms ease-in-out;
@@ -210,6 +208,12 @@ export default function Admin() {
     });
   }
 
+  const addLink = () => {
+    if (links != null) {
+      setLinks([...links, { title: '', url: '' }]);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       {authorized == false ? (
@@ -282,9 +286,14 @@ export default function Admin() {
                       </Container>
                     </Reorder.Item>
                   ))}
-                  <button type="submit" className={styles.saveButton}>
-                    Save Changes
-                  </button>
+                  <div className={styles.buttonsContainer}>
+                    <button type="submit" className={styles.saveButton}>
+                      Save Changes
+                    </button>
+                    <button onClick={addLink} className={styles.addButton}>
+                      <FontAwesomeIcon icon={faPlus} />
+                    </button>
+                  </div>
                 </Reorder.Group>
               </form>
             ) : (
