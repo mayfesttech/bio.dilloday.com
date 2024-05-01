@@ -62,3 +62,91 @@
   transition-timing-function: ease-in-out;
   transition: transform 0.5s;
 }
+
+.li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin: 32px 0;
+  padding: 0;
+}
+
+.form {
+  width: 100%;
+}
+
+.grip {
+  margin: auto 20px;
+  font-size: 18px;
+  transition: color 150ms ease-in-out;
+}
+
+.grip:hover {
+  color: #d54c54;
+  transition: color 150ms ease-in-out;
+}
+
+.saveButton {
+  border: none;
+  background-color: #d44c54;
+  color: #f5efdb;
+  padding: 25px 0;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
+
+.saveButton:hover {
+  background-color: #f5efdb;
+  color: #d44c54;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
+
+.input {
+  height: 35px;
+  background-color: #05060f0a;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  border: 2px solid transparent;
+  font-size: 1rem;
+  transition:
+    border-color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    background 0.2s cubic-bezier(0.25, 0.01, 0.25, 1) 0s;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #13381f;
+  transition: color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s;
+  text-align: start;
+}
+
+.input:hover,
+.input:focus,
+.inputGroup:hover .input {
+  outline: none;
+  border-color: #13381f;
+}
+
+.inputGroup:hover .label,
+.input:focus {
+  color: #13381f;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  justify-items: flex-start;
+}

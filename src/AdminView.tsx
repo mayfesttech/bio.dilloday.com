@@ -1,16 +1,18 @@
 import styled, { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider, db } from './app';
 import styles from './adminview.module.css';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import {
+  faRightFromBracket,
+  faGripVertical,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { LinkData } from './types';
-import Link from './components/Link';
-import Links from './components/Links';
+import { Reorder, motion } from 'framer-motion';
 
 const Background = styled.img`
   width: 100%;
@@ -25,7 +27,7 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 640px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 64px 32px;
   box-sizing: border-box;
@@ -46,6 +48,54 @@ const StatusText = styled.p`
   opacity: 0.75;
   height: 256px;
 `;
+
+const TextContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 2px solid ${({ theme }) => theme.linkBackground};
+  background: ${({ theme }) => theme.linkBackground};
+  color: ${({ theme }) => theme.linkForeground};
+  border-radius: 0 16px 16px 0;
+  width: 100%;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+`;
+
+const Container = styled(motion.div)`
+  display: flex;
+  background: ${({ theme }) => theme.linkBackground};
+  color: ${({ theme }) => theme.linkForeground};
+  border-radius: 16px;
+  width: 100%;
+  text-decoration: none;
+  padding: 20px 20px 20px 0;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+`;
+
+const Text = styled.p`
+  font-weight: 500;
+`;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.4,
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const variants = {
+  hidden: { y: -20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
 
 export default function Admin() {
   const [authorized, setAuthorized] = useState(false);
@@ -136,6 +186,30 @@ export default function Admin() {
     });
   }, []);
 
+  function saveChanges(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const formJson = Object.fromEntries(formData.entries());
+
+    var tmp: LinkData[] = [];
+
+    for (var i: number = 0; i < (links ? links.length : 0); i++) {
+      tmp.push({
+        title: formJson['title' + i.toString()] as string,
+        url: formJson['url' + i.toString()] as string,
+      });
+    }
+    setLinks(tmp);
+
+    const contentRef = doc(db, 'bio', 'content');
+    updateDoc(contentRef, {
+      links: tmp,
+    });
+  }
+
   return (
     <ThemeProvider theme={theme}>
       {authorized == false ? (
@@ -163,11 +237,56 @@ export default function Admin() {
           <Main>
             <Logo src="/logo.png" />
             {links ? (
-              <Links>
-                {links.map((link) => (
-                  <Link key={link.title} {...link} />
-                ))}
-              </Links>
+              <form onSubmit={saveChanges} className={styles.form}>
+                <Reorder.Group
+                  className={styles.li}
+                  values={links}
+                  onReorder={setLinks}
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {links.map((link, i) => (
+                    <Reorder.Item
+                      value={link}
+                      key={link.url}
+                      variants={variants}
+                    >
+                      <Container>
+                        <FontAwesomeIcon
+                          icon={faGripVertical}
+                          className={styles.grip}
+                        />
+                        <TextContainer>
+                          <div className={styles.inputGroup}>
+                            <label className={styles.label}>Title</label>
+                            <input
+                              autoComplete="off"
+                              name={'title' + i.toString()}
+                              id={'title' + i.toString()}
+                              className={styles.input}
+                              defaultValue={link.title}
+                            />
+                          </div>
+                          <div className={styles.inputGroup}>
+                            <label className={styles.label}>Url</label>
+                            <input
+                              autoComplete="off"
+                              name={'url' + i.toString()}
+                              id={'url' + i.toString()}
+                              className={styles.input}
+                              defaultValue={link.url}
+                            />
+                          </div>
+                        </TextContainer>
+                      </Container>
+                    </Reorder.Item>
+                  ))}
+                  <button type="submit" className={styles.saveButton}>
+                    Save Changes
+                  </button>
+                </Reorder.Group>
+              </form>
             ) : (
               <StatusText>{status}</StatusText>
             )}
