@@ -9,6 +9,7 @@ import {
   faRightFromBracket,
   faGripVertical,
   faPlus,
+  faTrashCan,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -60,6 +61,7 @@ const TextContainer = styled.div`
   border-radius: 0 16px 16px 0;
   width: 100%;
   text-decoration: none;
+  margin: 20px 0 20px 0;
 `;
 
 const Container = styled(motion.div)`
@@ -69,7 +71,6 @@ const Container = styled(motion.div)`
   border-radius: 16px;
   width: 100%;
   text-decoration: none;
-  padding: 20px 0 20px 0;
   transition:
     background-color 150ms ease-in-out,
     color 150ms ease-in-out;
@@ -214,6 +215,38 @@ export default function Admin() {
     }
   };
 
+  const deleteLink = (link: LinkData) => {
+    if (links != null) {
+      setLinks(
+        links.filter((l) => l.title !== link.title && l.url !== link.url)
+      );
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, i: number) => {
+    if (links != null) {
+      const isTitle = e.target.name.includes('title');
+      const newLinks = links.map((l, idx) => {
+        if (idx == i) {
+          if (isTitle) {
+            return {
+              title: e.target.value,
+              url: l.url,
+            };
+          } else {
+            return {
+              title: l.title,
+              url: e.target.value,
+            };
+          }
+        } else {
+          return l;
+        }
+      });
+      setLinks(newLinks);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       {authorized == false ? (
@@ -270,6 +303,7 @@ export default function Admin() {
                               id={'title' + i.toString()}
                               className={styles.input}
                               defaultValue={link.title}
+                              onChange={(e) => handleChange(e, i)}
                             />
                           </div>
                           <div className={styles.inputGroup}>
@@ -280,9 +314,19 @@ export default function Admin() {
                               id={'url' + i.toString()}
                               className={styles.input}
                               defaultValue={link.url}
+                              onChange={(e) => handleChange(e, i)}
                             />
                           </div>
                         </TextContainer>
+                        <div className={styles.trashContainer}>
+                          <button
+                            type="reset"
+                            onClick={() => deleteLink(link)}
+                            className={styles.trashButton}
+                          >
+                            <FontAwesomeIcon icon={faTrashCan} />
+                          </button>
+                        </div>
                       </Container>
                     </Reorder.Item>
                   ))}
@@ -290,7 +334,11 @@ export default function Admin() {
                     <button type="submit" className={styles.saveButton}>
                       Save Changes
                     </button>
-                    <button onClick={addLink} className={styles.addButton}>
+                    <button
+                      type="reset"
+                      onClick={addLink}
+                      className={styles.addButton}
+                    >
                       <FontAwesomeIcon icon={faPlus} />
                     </button>
                   </div>

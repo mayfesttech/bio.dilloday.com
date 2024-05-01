@@ -179,3 +179,36 @@
     background-color 150ms ease-in-out,
     color 150ms ease-in-out;
 }
+
+.trashContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.trashButton {
+  border: none;
+  border-radius: 0 15px 15px 0;
+  background-color: #d44c54;
+  font-size: 20px;
+  color: #f5efdb;
+  width: 100%;
+  padding-left: 30px;
+  padding-right: 30px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
+
+.trashButton:hover {
+  border: none;
+  border-radius: 0 15px 15px 0;
+  background-color: #f5efdb;
+  font-size: 20px;
+  color: #d44c54;
+  width: 100%;
+  padding-left: 30px;
+  padding-right: 30px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
