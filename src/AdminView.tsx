@@ -3,7 +3,6 @@ import { theme } from './theme';
 import { FormEvent, useEffect, useState } from 'react';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider, db } from './app';
-import styles from './adminview.module.css';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import {
   faRightFromBracket,
@@ -15,6 +14,117 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { LinkData } from './types';
 import { Reorder, motion } from 'framer-motion';
+
+const SaveButton = styled.button`
+  border: none;
+  background-color: #d44c54;
+  color: #f5efdb;
+  padding: 25px 0;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+  width: 100%;
+
+  &:hover {
+    background-color: #f5efdb;
+    color: #d44c54;
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out;
+  }
+`;
+
+const AddButton = styled.button`
+  border: none;
+  background-color: #f8b547;
+  color: #f5efdb;
+  padding: 25px 0;
+  font-weight: 900;
+  font-size: 20px;
+  border-radius: 15px;
+  width: 100px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+
+  &:hover {
+    background-color: #f5efdb;
+    color: #f8b547;
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out;
+  }
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const Icon = styled(FontAwesomeIcon)`
+  margin: auto 0;
+  font-size: 25px;
+  color: #13381f;
+`;
+
+const SignInOutText = styled.p`
+  font-size: 20px;
+  font-weight: 600;
+  color: #13381f;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8b547;
+  border-radius: 10px;
+  gap: 10px;
+  width: fit-content;
+  height: 50px;
+  margin: auto 0;
+  padding: 0 15px;
+  transform: scale(1);
+  transition-timing-function: ease-in-out;
+  transition: transform 0.5s;
+
+  &:hover {
+    transform: scale(1.1);
+    transition-timing-function: ease-in-out;
+    transition: transform 0.5s;
+  }
+`;
+
+const TrashContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const TrashButton = styled.button`
+  border: none;
+  border-radius: 0 15px 15px 0;
+  background-color: #d44c54;
+  font-size: 20px;
+  color: #f5efdb;
+  width: 100%;
+  padding-left: 30px;
+  padding-right: 30px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+
+  &:hover {
+    background-color: #f5efdb;
+    color: #d44c54;
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out;
+  }
+`;
 
 const Background = styled.img`
   width: 100%;
@@ -76,8 +186,89 @@ const Container = styled(motion.div)`
     color 150ms ease-in-out;
 `;
 
-const Text = styled.p`
-  font-weight: 500;
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-items: flex-start;
+  margin-right: 20px;
+
+  &:hover {
+    color: #13381f;
+    outline: none;
+    border-color: #13381f;
+  }
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #13381f;
+  transition: color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s;
+  text-align: start;
+`;
+
+const Input = styled.input`
+  height: 35px;
+  background-color: #05060f0a;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  border: 2px solid transparent;
+  font-size: 1rem;
+  transition:
+    border-color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    background 0.2s cubic-bezier(0.25, 0.01, 0.25, 1) 0s;
+
+  &:focus {
+    outline: none;
+    border-color: #13381f;
+    color: #13381f;
+  }
+  &:hover {
+    outline: none;
+    border-color: #13381f;
+  }
+`;
+
+const Grip = styled(FontAwesomeIcon)`
+  margin: auto 20px;
+  font-size: 18px;
+  transition: color 150ms ease-in-out;
+
+  &:hover {
+    color: #d54c54;
+    transition: color 150ms ease-in-out;
+  }
+`;
+
+const ReorderGroup = styled(Reorder.Group)`
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin: 32px 0;
+  padding: 0;
+`;
+
+const Form = styled.form`
+  width: 100%;
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const Header = styled.h2`
+  margin: auto auto;
 `;
 
 const containerVariants = {
@@ -126,7 +317,7 @@ export default function Admin() {
     }
   }, [authorized]);
 
-  var validEmails = [] as string[];
+  let validEmails = [] as string[];
 
   const handleClick = () => {
     signInWithPopup(auth, provider).then((result) => {
@@ -153,7 +344,7 @@ export default function Admin() {
             setLoading(false);
           }
         })
-        .catch((error) => {
+        .catch(() => {
           setStatus('Error logging in. Please try again');
         });
     });
@@ -164,14 +355,14 @@ export default function Admin() {
     setLoading(true);
     getDoc(docRef).then((doc) => {
       if (doc.exists()) {
-        validEmails = doc.data().users;
-
         if (
-          validEmails.includes(
-            localStorage.getItem('email')
-              ? (localStorage.getItem('email') as string)
-              : ''
-          )
+          doc
+            .data()
+            .users.includes(
+              localStorage.getItem('email')
+                ? (localStorage.getItem('email') as string)
+                : ''
+            )
         ) {
           setAuthorized(true);
           setStatus('Dilloading links...');
@@ -193,9 +384,9 @@ export default function Admin() {
 
     const formJson = Object.fromEntries(formData.entries());
 
-    var tmp: LinkData[] = [];
+    const tmp: LinkData[] = [];
 
-    for (var i: number = 0; i < (links ? links.length : 0); i++) {
+    for (let i: number = 0; i < (links ? links.length : 0); i++) {
       tmp.push({
         title: formJson['title' + i.toString()] as string,
         url: formJson['url' + i.toString()] as string,
@@ -255,16 +446,13 @@ export default function Admin() {
           <Main>
             <Logo src="/logo.png" />
             {loading ? null : (
-              <div className={styles.contentContainer}>
-                <h2 className={styles.header}>{status}</h2>
-                <div onClick={handleClick} className={styles.buttonContainer}>
-                  <p className={styles.signInText}>Sign in with </p>
-                  <FontAwesomeIcon
-                    className={styles.googleButton}
-                    icon={faGoogle}
-                  />
-                </div>
-              </div>
+              <ContentContainer>
+                <Header>{status}</Header>
+                <ButtonContainer onClick={handleClick}>
+                  <SignInOutText>Sign in with </SignInOutText>
+                  <Icon icon={faGoogle} />
+                </ButtonContainer>
+              </ContentContainer>
             )}
           </Main>
         </div>
@@ -274,9 +462,8 @@ export default function Admin() {
           <Main>
             <Logo src="/logo.png" />
             {links ? (
-              <form onSubmit={saveChanges} className={styles.form}>
-                <Reorder.Group
-                  className={styles.li}
+              <Form onSubmit={saveChanges}>
+                <ReorderGroup
                   values={links}
                   onReorder={setLinks}
                   variants={containerVariants}
@@ -290,60 +477,48 @@ export default function Admin() {
                       variants={variants}
                     >
                       <Container>
-                        <FontAwesomeIcon
-                          icon={faGripVertical}
-                          className={styles.grip}
-                        />
+                        <Grip icon={faGripVertical} />
                         <TextContainer>
-                          <div className={styles.inputGroup}>
-                            <label className={styles.label}>Title</label>
-                            <input
+                          <InputGroup>
+                            <Label>Title</Label>
+                            <Input
                               autoComplete="off"
                               name={'title' + i.toString()}
                               id={'title' + i.toString()}
-                              className={styles.input}
                               defaultValue={link.title}
                               onChange={(e) => handleChange(e, i)}
                             />
-                          </div>
-                          <div className={styles.inputGroup}>
-                            <label className={styles.label}>Url</label>
-                            <input
+                          </InputGroup>
+                          <InputGroup>
+                            <Label>Url</Label>
+                            <Input
                               autoComplete="off"
                               name={'url' + i.toString()}
                               id={'url' + i.toString()}
-                              className={styles.input}
                               defaultValue={link.url}
                               onChange={(e) => handleChange(e, i)}
                             />
-                          </div>
+                          </InputGroup>
                         </TextContainer>
-                        <div className={styles.trashContainer}>
-                          <button
+                        <TrashContainer>
+                          <TrashButton
                             type="reset"
                             onClick={() => deleteLink(link)}
-                            className={styles.trashButton}
                           >
                             <FontAwesomeIcon icon={faTrashCan} />
-                          </button>
-                        </div>
+                          </TrashButton>
+                        </TrashContainer>
                       </Container>
                     </Reorder.Item>
                   ))}
-                  <div className={styles.buttonsContainer}>
-                    <button type="submit" className={styles.saveButton}>
-                      Save Changes
-                    </button>
-                    <button
-                      type="reset"
-                      onClick={addLink}
-                      className={styles.addButton}
-                    >
+                  <ButtonsContainer>
+                    <SaveButton type="submit">Save Changes</SaveButton>
+                    <AddButton type="reset" onClick={addLink}>
                       <FontAwesomeIcon icon={faPlus} />
-                    </button>
-                  </div>
-                </Reorder.Group>
-              </form>
+                    </AddButton>
+                  </ButtonsContainer>
+                </ReorderGroup>
+              </Form>
             ) : (
               <StatusText>{status}</StatusText>
             )}
@@ -375,19 +550,16 @@ function SignOut(props: SignOutProps) {
         props.setStatus('To access the admin page, please sign in.');
         props.setLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         props.setStatus('Error signing out! Please try again.');
         props.setLoading(false);
       });
   };
 
   return (
-    <div onClick={handleClick} className={styles.buttonContainer}>
-      <p className={styles.signInText}>Sign Out</p>
-      <FontAwesomeIcon
-        className={styles.googleButton}
-        icon={faRightFromBracket}
-      />
-    </div>
+    <ButtonContainer onClick={handleClick}>
+      <SignInOutText>Sign Out</SignInOutText>
+      <Icon icon={faRightFromBracket} />
+    </ButtonContainer>
   );
 }
